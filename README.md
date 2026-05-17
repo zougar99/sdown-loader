@@ -1,138 +1,121 @@
 # SDown Loader
 
-[![GitHub Repo](https://img.shields.io/badge/GitHub-sdown--loader-blue)](https://github.com/zougar99/sdown-loader)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-blue)
 ![Python](https://img.shields.io/badge/Python-3.7%2B-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 ![Version](https://img.shields.io/badge/Version-2.0.0-blue)
 
-A powerful Spotify downloader for Windows, macOS, and Linux. Download playlists, albums, and single tracks with ease.
+تطبيق متكامل لتحميل الأغاني من Spotify - يعمل على Windows و macOS و Linux
 
-## Features
+## المميزات
 
-- 📋 Download complete playlists
-- 🎵 Download single tracks
-- 💿 Download full albums
-- 🔍 Search and download
-- 📚 Batch download multiple links
-- 📂 Manage downloaded files
-- 📜 Download history
-- 📦 Multiple format support (MP3, FLAC, M4A, WAV, OGG)
-- ⚙️ Advanced settings
-- 📋 Clipboard support (paste link automatically)
-- 🎨 GUI Version available
+- 📋 تحميل Playlist كامل
+- 🎵 تحميل أغنية واحدة
+- 💿 تحميل ألبوم كامل
+- 🔍 البحث وتحميل
+- 📚 تحميل مجموعة روابط
+- 📂 إدارة الملفات المحملة
+- 📜 سجل التحميل
+- 📦 دعم صيغ متعددة (MP3, FLAC, M4A, WAV, OGG)
+- ⚙️ إعدادات متقدمة
+- 📋 دعم الحافظة (نسخ الرابط تلقائياً)
 
-## Quick Start
+## تواصل
 
-### Installation
+📞 **Telegram**: @werlist99
 
-```bash
-# Clone the repository
-git clone https://github.com/werlist99/SDown_Loader.git
-cd SDown_Loader
+للدعم والاستفسارات تواصل معنا على Telegram
 
-# Install dependencies
-pip install -r requirements.txt
-```
-
-### Usage - Command Line
-
-```bash
-# Run the app
-python SDown_Loader.py
-```
-
-### Usage - GUI Version
-
-```bash
-# Run with graphical interface
-python SDown_GUI.py
-```
-
-## Requirements
+## المتطلبات
 
 ### Python
-- Python 3.7 or higher
+- Python 3.7 أو أعلى
 
-### Dependencies
-```
-spotdl>=4.0.0
-pyperclip>=1.8.0
+### التبعيات
+```bash
+pip install spotdl pyperclip
 ```
 
-### FFmpeg (Required)
-- **Windows**: Download from [ffmpeg.org](https://www.gyan.dev/ffmpeg/builds/) or use `winget install ffmpeg`
+### FFmpeg (مطلوب)
+- **Windows**: حمل من [ffmpeg.org](https://www.gyan.dev/ffmpeg/builds/) أو استخدم `winget install ffmpeg`
 - **macOS**: `brew install ffmpeg`
-- **Linux**: `sudo apt install ffmpeg` (Debian/Ubuntu) or `sudo pacman -S ffmpeg` (Arch)
+- **Linux**: `sudo apt install ffmpeg` (Debian/Ubuntu) أو `sudo pacman -S ffmpeg` (Arch)
 
-## Menu Options
+## التثبيت
 
-1. 📋 Download Playlist
-2. 🎵 Download Single Track
-3. 💿 Download Album
-4. 🔍 Search and Download
-5. 📚 Batch Download
-6. 📂 Manage Downloads
-7. 📜 Download History
-8. ⚙️ Settings
-0. 🚪 Exit
-
-## Format Options
-
-- MP3 (default)
-- FLAC (high quality)
-- M4A
-- WAV
-- OGG
-
-## Files Structure
-
+1. ثبت Python 3.7+ من [python.org](https://www.python.org/)
+2. ثبت التبعيات:
+```bash
+pip install spotdl pyperclip
 ```
-SDown_Loader/
-├── SDown_Loader.py     # Main application (CLI)
-├── SDown_GUI.py        # GUI version
-├── SDown_Simple.py     # Simple version
-├── requirements.txt    # Dependencies
-└── README.md           # This file
+3. ثبت FFmpeg حسب نظامك
+
+## الاستخدام
+
+### تشغيل التطبيق
+```bash
+python spotify_downloader.py
 ```
 
-## Troubleshooting
+### تحميل Playlist
+اختر 1 وأدخل رابط الـ Playlist
 
-### FFmpeg Issues
-- Make sure FFmpeg is added to PATH
-- On Windows: Add ffmpeg/bin to environment variables
+### تحميل أغنية واحدة
+اختر 2 وأدخل رابط الأغنية
 
-### Rate Limit Issues
-- Wait 24 hours or use Spotify Authentication
-- Visit: https://developer.spotify.com/dashboard
+### تحميل ألبوم
+اختر 3 وأدخل رابط الألبوم
 
-### Installation Issues
+### البحث
+اختر 4 وأدخل اسم الأغنية أو الفنان
+
+## الأوامر المباشرة
+
+```bash
+# تحميل playlist
+python spotify_downloader.py "https://open.spotify.com/playlist/..."
+
+# تحميل مع authentication
+python spotify_downloader.py --auth "https://open.spotify.com/playlist/..."
+```
+
+## هيكل المشروع
+
+```
+Spotify-Downloader/
+├── spotify_downloader.py   # التطبيق الرئيسي
+├── spotify_simple.py       # نسخة بسيطة
+├── downloads/             # مجلد التحميلات (يُنشأ تلقائياً)
+└── README.md              # هذا الملف
+```
+
+## استكشاف الأخطاء
+
+### مشكلة FFmpeg
+- تأكد من إضافة FFmpeg إلى PATH
+- على Windows: أضف مسار ffmpeg/bin إلى متغيرات البيئة
+
+### مشكلة Rate Limit
+- انتظر 24 ساعة أو استخدم Spotify Authentication
+- راجع: https://developer.spotify.com/dashboard
+
+### مشكلة التثبيت
 ```bash
 pip install --upgrade spotdl
 ```
 
-## GitHub
-
-🔗 **Repository**: https://github.com/zougar99/sdown-loader
-
-## Contact
-
-📞 **Telegram**: @werlist99
-
-For support and inquiries, contact us on Telegram.
-
-## Version
-
-Current Version: 2.0.0
-
-## Developer
-
-👤 **zougar99** - GitHub: @zougar99 | Telegram: @werlist99
-
-## License
+## الترخيص
 
 MIT License
 
-## Warning
+## الإصدار
 
-This application is for personal use only. Please respect copyright laws.
+الإصدار الحالي: 2.0.0
+
+## المطور
+
+👤 **werlist99** - Telegram: @werlist99
+
+## تحذير
+
+هذا التطبيق للاستخدام الشخصي فقط. تأكد من احترام حقوق الملكية الفكرية.
