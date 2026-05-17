@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 SDown Loader - Spotify Downloader
-تطبيق متكامل لتحميل الأغاني من Spotify
+A complete application for downloading songs from Spotify
 """
 
 import os
@@ -19,7 +19,7 @@ except ImportError:
     HAS_CLIPBOARD = False
 
 if sys.version_info < (3, 7):
-    print("✗ Error: Python 3.7 or higher required")
+    print("Error: Python 3.7 or higher required")
     sys.exit(1)
 
 def check_dependencies():
@@ -47,19 +47,19 @@ def get_ffmpeg_install_instructions():
     system = sys.platform
     if system == 'win32':
         return """
-للتثبيت على Windows:
-  1. حمل FFmpeg من: https://www.gyan.dev/ffmpeg/builds/
-  2. فك الضغط وأضف المجلد bin إلى PATH
-  3. أو استخدم: winget install ffmpeg
+To install FFmpeg on Windows:
+  1. Download from: https://www.gyan.dev/ffmpeg/builds/
+  2. Extract and add the bin folder to PATH
+  3. Or use: winget install ffmpeg
 """
     elif system == 'darwin':
         return """
-للتثبيت على macOS:
+To install FFmpeg on macOS:
   brew install ffmpeg
 """
     else:
         return """
-للتثبيت على Linux:
+To install FFmpeg on Linux:
   Ubuntu/Debian: sudo apt install ffmpeg
   Arch: sudo pacman -S ffmpeg
   Fedora: sudo dnf install ffmpeg
@@ -161,10 +161,10 @@ def download_single_track(url, output_dir, output_format="mp3"):
     url = url.split('?')[0].split('#')[0].strip()
     
     print(f"\n{'='*60}")
-    print(f"🎵 Downloading single track...")
-    print(f"🔗 {url}")
-    print(f"📁 Folder: {output_dir}")
-    print(f"📦 Format: {output_format}")
+    print(f"Downloading single track...")
+    print(f"URL: {url}")
+    print(f"Folder: {output_dir}")
+    print(f"Format: {output_format}")
     print(f"{'='*60}")
     
     cmd = get_python_cmd() + [
@@ -183,14 +183,14 @@ def download_single_track(url, output_dir, output_format="mp3"):
     process.wait()
     success = process.returncode == 0
     if success:
-        save_history({"type": "track", "url": url, "format": output_format, "time": str(Path().stat().st_ctime) if Path().exists() else ""})
+        save_history({"type": "track", "url": url, "format": output_format})
     return success
 
 def download_album(url, output_dir, output_format="mp3"):
     url = url.split('?')[0].split('#')[0].strip()
     
     if not re.match(r'https://(open\.)?spotify\.com/album/[a-zA-Z0-9]+', url):
-        print("❌ رابط ألبوم غير صحيح")
+        print("Invalid album URL")
         return False
     
     album_id = re.search(r'album/([a-zA-Z0-9]+)', url)
@@ -200,10 +200,10 @@ def download_album(url, output_dir, output_format="mp3"):
     output_dir.mkdir(parents=True, exist_ok=True)
     
     print(f"\n{'='*60}")
-    print(f"💿 Downloading album: {album_name}")
-    print(f"🔗 {url}")
-    print(f"📁 المجلد: {output_dir}")
-    print(f"📦 الصيغة: {output_format}")
+    print(f"Downloading album: {album_name}")
+    print(f"URL: {url}")
+    print(f"Folder: {output_dir}")
+    print(f"Format: {output_format}")
     print(f"{'='*60}")
     
     cmd = get_python_cmd() + [
@@ -214,15 +214,9 @@ def download_album(url, output_dir, output_format="mp3"):
     ]
     
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
-    downloaded = 0
-    total = 0
     
     for line in process.stdout:
         print(line, end='', flush=True)
-        if "Downloaded" in line:
-            downloaded += 1
-        if "Skipping" in line:
-            downloaded += 1
     
     process.wait()
     success = process.returncode == 0
@@ -234,7 +228,7 @@ def download_playlist(url, output_dir, use_auth=False, output_format="mp3"):
     url = url.split('?')[0].split('#')[0].strip()
     
     if not re.match(r'https://(open\.)?spotify\.com/playlist/[a-zA-Z0-9]+', url):
-        print("❌ رابط playlist غير صحيح")
+        print("Invalid playlist URL")
         return False
     
     playlist_id = re.search(r'playlist/([a-zA-Z0-9]+)', url)
@@ -244,10 +238,10 @@ def download_playlist(url, output_dir, use_auth=False, output_format="mp3"):
     output_dir.mkdir(parents=True, exist_ok=True)
     
     print(f"\n{'='*60}")
-    print(f"📋 Downloading Playlist...")
-    print(f"🔗 {url}")
-    print(f"📁 المجلد: {output_dir}")
-    print(f"📦 الصيغة: {output_format}")
+    print(f"Downloading Playlist...")
+    print(f"URL: {url}")
+    print(f"Folder: {output_dir}")
+    print(f"Format: {output_format}")
     print(f"{'='*60}")
     
     cmd = get_python_cmd() + [
@@ -262,33 +256,26 @@ def download_playlist(url, output_dir, use_auth=False, output_format="mp3"):
     
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
     
-    progress = {"current": 0, "total": 0, "errors": []}
-    
     for line in process.stdout:
         print(line, end='', flush=True)
-        line_lower = line.lower()
-        if "downloading [" in line_lower:
-            progress["current"] += 1
-        elif "error" in line_lower:
-            progress["errors"].append(line.strip())
     
     process.wait()
     
     if process.returncode == 0:
-        print(f"\n✅ تم تحميل الـ Playlist بنجاح!")
-        print(f"📁 الملفات في: {os.path.abspath(output_dir)}")
+        print(f"\nPlaylist downloaded successfully!")
+        print(f"Files saved to: {os.path.abspath(output_dir)}")
         save_history({"type": "playlist", "name": playlist_name, "url": url, "format": output_format})
         return True
     return False
 
 def batch_download(urls, output_dir, output_format="mp3"):
     print(f"\n{'='*60}")
-    print(f"📚 Downloading {len(urls)} items...")
+    print(f"Downloading {len(urls)} items...")
     print(f"{'='*60}")
     
     success_count = 0
     for i, url in enumerate(urls, 1):
-        print(f"\n📥 تحميل {i}/{len(urls)}")
+        print(f"\nDownloading {i}/{len(urls)}")
         try:
             if "playlist" in url:
                 if download_playlist(url, output_dir, False, output_format):
@@ -300,10 +287,10 @@ def batch_download(urls, output_dir, output_format="mp3"):
                 if download_single_track(url, output_dir / "Singles", output_format):
                     success_count += 1
         except Exception as e:
-            print(f"❌ خطأ في {url}: {e}")
+            print(f"Error with {url}: {e}")
     
     print(f"\n{'='*60}")
-    print(f"✅ تم تحميل {success_count}/{len(urls)} بنجاح")
+    print(f"Downloaded {success_count}/{len(urls)} successfully")
     print(f"{'='*60}")
     return success_count
 
@@ -311,11 +298,11 @@ def manage_downloaded_files(downloads_dir):
     files = list_downloaded_files(downloads_dir)
     
     if not files:
-        print("\n📁 لا توجد ملفات محملة")
+        print("\nNo downloaded files")
         return
     
     print(f"\n{'='*60}")
-    print(f"📂 الملفات المحملة ({len(files)} ملف)")
+    print(f"Downloaded Files ({len(files)} files)")
     print(f"{'='*60}")
     
     total_size = 0
@@ -325,32 +312,32 @@ def manage_downloaded_files(downloads_dir):
         size_str = format_size(size)
         print(f"{i:3}. {f.name[:50]:50} {size_str:>10}")
     
-    print(f"\n📊 المساحة الإجمالية: {format_size(total_size)}")
-    print(f"\nاختر:")
-    print("  [D] حذف ملف")
-    print("  [O] فتح المجلد")
-    print("  [C] حذف الكل")
-    print("  [0]戻る")
+    print(f"\nTotal Size: {format_size(total_size)}")
+    print(f"\nChoose:")
+    print("  [D] Delete file")
+    print("  [O] Open folder")
+    print("  [C] Delete all")
+    print("  [0] Back")
     
-    choice = input("👉 اختيارك: ").strip().lower()
+    choice = input("Enter choice: ").strip().lower()
     
     if choice == "d":
         try:
-            num = int(input("رقم الملف للحذف: "))
+            num = int(input("Enter file number to delete: "))
             if 1 <= num <= len(files):
                 files[num-1].unlink()
-                print("✅ تم الحذف")
+                print("Deleted")
         except:
-            print("❌ خطأ")
+            print("Error")
     elif choice == "c":
-        confirm = input("هل أنت متأكد؟ (y/n): ").strip().lower()
+        confirm = input("Are you sure? (y/n): ").strip().lower()
         if confirm == 'y':
             for f in files:
                 try:
                     f.unlink()
                 except:
                     pass
-            print("✅ تم حذف الكل")
+            print("All deleted")
     elif choice == "o":
         if sys.platform == 'win32':
             os.startfile(downloads_dir)
@@ -363,11 +350,11 @@ def show_download_history():
     history = load_history()
     
     print(f"\n{'='*60}")
-    print(f"📜 سجل التحميل ({len(history)})")
+    print(f"Download History ({len(history)})")
     print(f"{'='*60}")
     
     if not history:
-        print("لا يوجد سجل")
+        print("No history")
         return
     
     for i, item in enumerate(history[:20], 1):
@@ -376,24 +363,24 @@ def show_download_history():
         fmt = item.get("format", "mp3")
         name = item.get("name", "")
         
-        type_icon = {"playlist": "📋", "album": "💿", "track": "🎵"}.get(item_type, "📄")
-        print(f"{i:2}. {type_icon} {item_type.upper():8} | {fmt:5} | {name or url[:40]}")
+        type_icon = {"playlist": "PL", "album": "AL", "track": "TR"}.get(item_type, "??")
+        print(f"{i:2}. {type_icon} | {fmt:5} | {name or url[:40]}")
 
 def get_format_selection():
-    print("\n📦 اختر الصيغة:")
-    print("  [1] MP3 (افتراضي)")
-    print("  [2] FLAC (جودة عالية)")
+    print("\nSelect Format:")
+    print("  [1] MP3 (default)")
+    print("  [2] FLAC (high quality)")
     print("  [3] M4A")
     print("  [4] WAV")
     print("  [5] OGG")
     
-    choice = input("👉 اختيارك [1]: ").strip()
+    choice = input("Enter choice [1]: ").strip()
     formats = {"1": "mp3", "2": "flac", "3": "m4a", "4": "wav", "5": "ogg"}
     return formats.get(choice, "mp3")
 
 def search_and_download(query, output_dir):
     print(f"\n{'='*60}")
-    print(f"🔍 البحث عن: {query}")
+    print(f"Searching for: {query}")
     print(f"{'='*60}")
     
     output_dir = output_dir / "Search"
@@ -408,121 +395,108 @@ def search_and_download(query, output_dir):
     
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
     
-    results = []
     for line in process.stdout:
         print(line, end='', flush=True)
-        if "Found" in line and "result" in line:
-            results.append(line.strip())
     
     process.wait()
     return process.returncode == 0
 
 def show_menu():
     print("\n" + "="*60)
-    print("🎵 SDown Loader - القائمة الرئيسية".center(50))
+    print("SDown Loader - Main Menu".center(50))
     print("="*60)
     print("""
-اختر نوع التحميل:
-
-  [1] 📋 تحميل Playlist كامل
-  [2] 🎵 تحميل أغنية واحدة
-  [3] 💿 تحميل ألبوم كامل
-  [4] 🔍 بحث وتحميل
-  [5] 📚 تحميل مجموعة روابط
-  [6] 📂 إدارة الملفات المحملة
-  [7] 📜 سجل التحميل
-  [8] ⚙️  الإعدادات
-  [0] 🚪 خروج
-
+Select Download Type:
+  [1] Download Playlist
+  [2] Download Single Track
+  [3] Download Album
+  [4] Search and Download
+  [5] Batch Download URLs
+  [6] Manage Downloads
+  [7] Download History
+  [8] Settings
+  [0] Exit
 """)
     
-    choice = input("👉 اختيارك: ").strip()
+    choice = input("Enter your choice: ").strip()
     return choice
-
-def show_about():
-    print("\n" + "="*60)
-    print("ℹ️  حول التطبيق".center(50))
-    print("="*60)
-    print("""
-🎵 SDown Loader - الإصدار المحسن
-
-  📌 الإصدار: 2.0.0
-  📅 التحديث: 2026
-  
-  👤 المطور: werlist99
-  📞 تواصل: @werlist99 (Telegram)
-  
-  💻 متوافق مع:
-     - Windows
-     - macOS  
-     - Linux
-  
-  📚 المميزات:
-     - تحميل Playlist
-     - تحميل أغاني وألبومات
-     - بحث وتحميل
-     - دعم صيغ متعددة
-  
-  📂 رابط GitHub: (اضافة رابطك هنا)
-  
-  📢 للتواصل والدعم:
-     Telegram: @werlist99
-""")
-    input("\nاضغط Enter للعودة...")
 
 def show_settings_menu():
     while True:
         print("\n" + "="*60)
-        print("⚙️  الإعدادات".center(50))
+        print("Settings".center(50))
         print("="*60)
         print("""
-  [1] 🔐 إعداد Spotify Authentication
-  [2] 📁 تغيير مجلد التحميل
-  [3] 🔄 تحديث spotdl
-  [4] ℹ️  حالة المتطلبات
-  [5] 🆕 التحقق من التحديثات
-  [6] ℹ️  حول التطبيق
-  [0] 🔙 العودة
-
+  [1] Setup Spotify Authentication
+  [2] Change Download Directory
+  [3] Update spotdl
+  [4] System Status
+  [5] Check for Updates
+  [6] About
+  [0] Back
 """)
-        choice = input("👉 اختيارك: ").strip()
+        choice = input("Enter your choice: ").strip()
         
         if choice == "1":
-            print("\n📝 لتعزيل Authentication:")
-            print("   1. اذهب إلى: https://developer.spotify.com/dashboard")
-            print("   2. أنشئ تطبيق جديد")
-            print("   3. احصل على Client ID و Client Secret")
-            print("   4. شغل: py -3 -m spotdl --user-auth")
-            print("   5. سيتم فتح المتصفح للتسجيل")
-            input("\nاضغط Enter للعودة...")
+            print("\nTo setup Authentication:")
+            print("   1. Go to: https://developer.spotify.com/dashboard")
+            print("   2. Create a new application")
+            print("   3. Get Client ID and Client Secret")
+            print("   4. Run: py -3 -m spotdl --user-auth")
+            print("   5. Browser will open for login")
+            input("\nPress Enter to continue...")
         elif choice == "3":
-            print("🔄 جاري تحديث spotdl...")
+            print("Updating spotdl...")
             try:
                 subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "spotdl"])
-                print("✅ تم التحديث بنجاح!")
+                print("Update successful!")
             except:
-                print("❌ فشل التحديث")
-            input("اضغط Enter للعودة...")
+                print("Update failed")
+            input("\nPress Enter to continue...")
         elif choice == "4":
-            print("\n📋 حالة المتطلبات:")
+            print("\nSystem Status:")
             spotdl_ok = check_dependencies()
             ffmpeg_ok = check_ffmpeg()
-            print(f"   {'✅' if spotdl_ok else '❌'} spotdl: {'مثبت' if spotdl_ok else 'غير مثبت'}")
-            print(f"   {'✅' if ffmpeg_ok else '❌'} FFmpeg: {'مثبت' if ffmpeg_ok else 'غير مثبت'}")
-            input("\nاضغط Enter للعودة...")
+            print(f"   {'Installed' if spotdl_ok else 'Not installed'} spotdl")
+            print(f"   {'Installed' if ffmpeg_ok else 'Not installed'} FFmpeg")
+            input("\nPress Enter to continue...")
         elif choice == "5":
-            print("🔍 جاري التحقق من التحديثات...")
+            print("Checking for updates...")
             try:
                 result = subprocess.run([sys.executable, "-m", "pip", "index", "versions", "spotdl"], 
                                       capture_output=True, text=True, timeout=10)
-                print(result.stdout if result.stdout else "التطبيق محدث")
+                print(result.stdout if result.stdout else "App is up to date")
             except:
-                print("تعذر التحقق")
-            input("اضغط Enter للعودة...")
+                print("Unable to check")
+            input("\nPress Enter to continue...")
         elif choice == "6":
             show_about()
         elif choice == "0":
             break
+
+def show_about():
+    print("\n" + "="*60)
+    print("About".center(50))
+    print("="*60)
+    print("""
+  SDown Loader - Enhanced Version
+
+  Version: 2.0.0
+  Last Update: 2026
+  
+  Developer: zougar99
+  Contact: @werlist99 (Telegram)
+  
+  Compatible with:
+     - Windows
+     - macOS  
+     - Linux
+  
+  GitHub: https://github.com/zougar99/sdown-loader
+  
+  For support: Telegram @werlist99
+""")
+    input("\nPress Enter to continue...")
 
 def get_url_from_user(prompt_text):
     url = None
@@ -531,7 +505,7 @@ def get_url_from_user(prompt_text):
         try:
             clipboard_text = pyperclip.paste()
             if clipboard_text and "spotify.com" in clipboard_text.strip():
-                print(f"📋 تم العثور على رابط في الحافظة:")
+                print(f"Link found in clipboard:")
                 print(f"   {clipboard_text.strip()}")
                 use_clip = input(f"\n{prompt_text} (y/n, default: y): ").strip().lower()
                 if use_clip != 'n':
@@ -541,8 +515,8 @@ def get_url_from_user(prompt_text):
     
     if not url:
         print(prompt_text)
-        print("مثال: https://open.spotify.com/playlist/...")
-        url = input("👉 ").strip()
+        print("Example: https://open.spotify.com/playlist/...")
+        url = input("Enter URL: ").strip()
     
     return url
 
@@ -555,19 +529,19 @@ def main():
         sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
     
     print("\n" + "="*60)
-    print("🎵 Spotify Downloader - الإصدار المحسن".center(50))
+    print("SDown Loader - Enhanced Version".center(50))
     print("="*60)
     
     if not check_dependencies():
-        print("\n⚠️  spotdl غير مثبت")
-        response = input("هل تريد تثبيته الآن؟ (y/n): ").strip().lower()
+        print("\nspotdl is not installed")
+        response = input("Install it now? (y/n): ").strip().lower()
         if response == 'y':
-            print("جاري التثبيت...")
+            print("Installing...")
             try:
                 subprocess.check_call([sys.executable, "-m", "pip", "install", "spotdl"])
-                print("✅ تم التثبيت بنجاح!")
+                print("Installation successful!")
             except:
-                print("❌ فشل التثبيت")
+                print("Installation failed")
                 return
         else:
             return
@@ -582,7 +556,7 @@ def main():
             pass
     
     if not check_ffmpeg():
-        print("\n⚠️  FFmpeg غير مثبت")
+        print("\nFFmpeg is not installed")
         print(get_ffmpeg_install_instructions())
         return
     
@@ -593,39 +567,60 @@ def main():
         choice = show_menu()
         
         if choice == "1":
-            url = get_url_from_user("أدخل رابط الـ Playlist:")
+            url = get_url_from_user("Enter Playlist URL:")
             if url:
-                use_auth = input("هل تريد استخدام Authentication؟ (y/n): ").strip().lower() == 'y'
+                use_auth = input("Use Authentication? (y/n): ").strip().lower() == 'y'
                 download_playlist(url, downloads_dir, use_auth)
-            input("\nاضغط Enter للعودة...")
+            input("\nPress Enter to continue...")
         
         elif choice == "2":
-            url = get_url_from_user("أدخل رابط الأغنية:")
+            url = get_url_from_user("Enter Track URL:")
             if url:
                 download_single_track(url, downloads_dir / "Singles")
-            input("\nاضغط Enter للعودة...")
+            input("\nPress Enter to continue...")
         
         elif choice == "3":
-            url = get_url_from_user("أدخل رابط الألبوم:")
+            url = get_url_from_user("Enter Album URL:")
             if url:
                 download_album(url, downloads_dir)
-            input("\nاضغط Enter للعودة...")
+            input("\nPress Enter to continue...")
         
         elif choice == "4":
-            query = input("🔍 أدخل اسم الأغنية أو الفنان للبحث: ").strip()
+            query = input("Enter song/artist name to search: ").strip()
             if query:
                 search_and_download(query, downloads_dir)
-            input("\nاضغط Enter للعودة...")
+            input("\nPress Enter to continue...")
         
         elif choice == "5":
+            print("Enter URLs (one per line, empty line to finish):")
+            urls = []
+            while True:
+                line = input().strip()
+                if not line:
+                    break
+                urls.append(line)
+            if urls:
+                output_format = get_format_selection()
+                batch_download(urls, downloads_dir, output_format)
+            input("\nPress Enter to continue...")
+        
+        elif choice == "6":
+            manage_downloaded_files(downloads_dir)
+            input("\nPress Enter to continue...")
+        
+        elif choice == "7":
+            show_download_history()
+            input("\nPress Enter to continue...")
+        
+        elif choice == "8":
             show_settings_menu()
         
         elif choice == "0":
-            print("\n👋وداعاً! وشكراً لاستخدام SDown Loader")
+            print("\nGoodbye! Thanks for using SDown Loader")
             break
         
         else:
-            print("❌ خيار غير صحيح")
+            print("Invalid option")
 
 if __name__ == "__main__":
     main()

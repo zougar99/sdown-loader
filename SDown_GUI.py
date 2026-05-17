@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 SDown Loader - GUI Version
-تطبيق تحميل Spotify بواجهة رسومية
+A Spotify downloader with graphical interface
 """
 
 import os
@@ -89,15 +89,15 @@ class SpotifyDownloaderGUI:
     def check_dependencies(self):
         try:
             import spotdl
-            self.lbl_status.config(text="✅ spotdl مثبت", foreground="green")
+            self.lbl_status.config(text="spotdl: Installed", foreground="green")
         except:
-            self.lbl_status.config(text="⚠️ spotdl غير مثبت", foreground="orange")
+            self.lbl_status.config(text="spotdl: Not installed", foreground="orange")
         
         import shutil
         if shutil.which("ffmpeg"):
-            self.lbl_ffmpeg.config(text="✅ FFmpeg مثبت", foreground="green")
+            self.lbl_ffmpeg.config(text="FFmpeg: Installed", foreground="green")
         else:
-            self.lbl_ffmpeg.config(text="⚠️ FFmpeg غير مثبت", foreground="orange")
+            self.lbl_ffmpeg.config(text="FFmpeg: Not installed", foreground="orange")
     
     def create_widgets(self):
         main_frame = ttk.Frame(self.root, padding="20")
@@ -112,7 +112,7 @@ class SpotifyDownloaderGUI:
         lbl_dev = ttk.Label(title_frame, text=f"👤 {DEV_NAME} | 📞 {TELEGRAM}", font=('Arial', 9))
         lbl_dev.pack(pady=5)
         
-        link_frame = ttk.LabelFrame(main_frame, text="📋 الرابط", padding="10")
+        link_frame = ttk.LabelFrame(main_frame, text="Link", padding="10")
         link_frame.pack(fill=tk.X, pady=10)
         
         self.entry_url = ttk.Entry(link_frame, width=60, font=('Arial', 11))
@@ -146,10 +146,10 @@ class SpotifyDownloaderGUI:
         self.entry_dir = ttk.Entry(dir_frame, width=35)
         self.entry_dir.insert(0, self.settings.get("download_dir", "downloads"))
         self.entry_dir.pack(side=tk.LEFT, padx=10)
-        btn_dir = ttk.Button(dir_frame, text="📂 اختيار", command=self.choose_directory)
+        btn_dir = ttk.Button(dir_frame, text="Browse", command=self.choose_directory)
         btn_dir.pack(side=tk.LEFT)
         
-        self.btn_download = ttk.Button(main_frame, text="⬇️ تحميل الآن", command=self.start_download)
+        self.btn_download = ttk.Button(main_frame, text="Download Now", command=self.start_download)
         self.btn_download.pack(pady=20, ipadx=30)
         
         progress_frame = ttk.LabelFrame(main_frame, text="📊 التقدم", padding="10")
@@ -182,7 +182,7 @@ class SpotifyDownloaderGUI:
         
         menu_bar = tk.Menu(self.root)
         file_menu = tk.Menu(menu_bar, tearoff=0)
-        file_menu.add_command(label="📂 فتح مجلد التحميل", command=self.open_download_folder)
+        file_menu.add_command(label="Open Download Folder", command=self.open_download_folder)
         file_menu.add_command(label="⚙️ الإعدادات", command=self.show_settings)
         file_menu.add_separator()
         file_menu.add_command(label="🚪 خروج", command=self.root.quit)
